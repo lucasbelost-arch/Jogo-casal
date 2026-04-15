@@ -1,0 +1,77 @@
+<!DOCTYPE html><html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Verdade ou Desafio EXTREMO 🔥</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<style>
+body{font-family:Arial;background:linear-gradient(135deg,#1e1e2f,#3a0ca3);color:white;text-align:center;padding:20px}
+.card{background:rgba(255,255,255,0.1);border-radius:20px;padding:20px;margin:20px auto;max-width:400px}
+button{padding:10px 20px;margin:10px;border:none;border-radius:10px;font-size:16px;cursor:pointer}
+.verdade{background:#4cc9f0}
+.desafio{background:#f72585}
+input,select{padding:8px;border-radius:8px;border:none;margin:5px}
+</style>
+</head>
+<body><h1>🔥 Verdade ou Desafio EXTREMO 🔥</h1><div>
+<input id="room" placeholder="Nome da sala">
+<button onclick="criarSala()">Criar</button>
+<button onclick="entrarSala()">Entrar</button>
+</div><div>
+<select id="nivel">
+<option value="leve">Leve 😇</option>
+<option value="medio">Médio 😏</option>
+<option value="pesado">Pesado 🔥</option>
+</select>
+</div><div class="card" id="pergunta">Conecte-se...</div><button class="verdade" onclick="jogar('verdade')">Verdade</button> <button class="desafio" onclick="jogar('desafio')">Desafio</button>
+
+<script>
+let peer = new Peer();
+let conn;
+let turno = true;
+
+const perguntas = {
+leve:{
+verdade:["Qual seu beijo favorito?","Você gosta de carinho?"],
+desafio:["Mande um emoji fofo","Elogie a pessoa"]
+},
+medio:{
+verdade:["Qual parte do meu corpo você mais gosta?","Já pensou em mim antes de dormir?"],
+desafio:["Mande áudio provocante","Descreva um momento nosso"]
+},
+pesado:{
+verdade:["O que você faria comigo sozinho(a)?","Qual sua fantasia comigo?","Você gosta de dominar ou ser dominado(a)?"],
+desafio:["Mande mensagem bem ousada","Descreva algo quente em detalhes","Mande áudio sussurrando algo provocante"]
+}
+};
+
+function criarSala(){
+const id=document.getElementById('room').value;
+peer=new Peer(id);
+peer.on('connection',c=>{conn=c;setup();alert('Conectado 😏')});
+}
+
+function entrarSala(){
+const id=document.getElementById('room').value;
+conn=peer.connect(id);
+conn.on('open',()=>{setup();alert('Conectado 😏')});
+}
+
+function jogar(tipo){
+if(!turno){alert('Não é seu turno 😈');return}
+const nivel=document.getElementById('nivel').value;
+const lista=perguntas[nivel][tipo];
+const texto=lista[Math.floor(Math.random()*lista.length)];
+document.getElementById('pergunta').innerText=texto;
+conn.send({texto,turno:false});
+turno=false;
+}
+
+function setup(){
+conn.on('data',data=>{
+document.getElementById('pergunta').innerText=data.texto;
+turno=data.turno;
+});
+}
+</script></body>
+</html>
